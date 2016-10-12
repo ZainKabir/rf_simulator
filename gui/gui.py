@@ -10,8 +10,8 @@ from matplotlib import style
 import tkinter as tk
 import ttk
 import numpy as np
-from sweep import Simulator
-
+from sweep import Simulator\
+from localize import solve
 
 LARGE_FONT= ("Verdana", 12)
 style.use("ggplot")
