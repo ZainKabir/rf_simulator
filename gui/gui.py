@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
@@ -8,7 +9,6 @@ from matplotlib import style
 
 import tkinter as tk
 import ttk
-
 import numpy as np
 from sweep import Simulator
 
@@ -17,18 +17,21 @@ LARGE_FONT= ("Verdana", 12)
 style.use("ggplot")
 
 f = Figure(figsize=(10, 10), dpi=100)
-a = f.add_subplot(111)
+a = f.add_subplot(211)
+a1 = f.add_subplot(212)
+fmcw = Simulator([20, 30, 40, 45], [85, 35, 25, 20])
 
 def animate(i):
     
-    a.clear()
-    fmcw = Simulator([20, 30, 40, 45], [15, 18, 22, 24, 27], [85, 35, 25, 20], 40)
-    signal = fmcw.extract_movement()
-    a.plot(signal)
+    a.clear(); a1.clear()
+    a.set_title('TOF Profile of Antenna 1'); a1.set_title('TOF Profile of Antenna 2')
+    signal = fmcw.set_params([15, 18, 22, 24, 27], 40, extract=True)
+    a.plot(signal)   
+    a1.plot(signal)
 
 class App(tk.Tk):
 
-    """Docstring for App. """
+    """Main App Settings. """
 
     def __init__(self):
         tk.Tk.__init__(self)
@@ -44,7 +47,7 @@ class App(tk.Tk):
 
 class MainPage(tk.Frame):
 
-    """Docstring for Main. """
+    """Main Page to Display Real Time Plots. """
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
