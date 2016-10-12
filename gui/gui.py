@@ -10,24 +10,44 @@ from matplotlib import style
 import tkinter as tk
 import ttk
 import numpy as np
-from sweep import Simulator\
+from sweep import Simulator
 from localize import solve
 
 LARGE_FONT= ("Verdana", 12)
 style.use("ggplot")
 
 f = Figure(figsize=(10, 10), dpi=100)
-a = f.add_subplot(211)
-a1 = f.add_subplot(212)
+a1 = f.add_subplot(311)
+a2 = f.add_subplot(312)
+a3 = f.add_subplot(313)
 fmcw = Simulator([20, 30, 40, 45], [85, 35, 25, 20])
 
 def animate(i):
     
-    a.clear(); a1.clear()
-    a.set_title('TOF Profile of Antenna 1'); a1.set_title('TOF Profile of Antenna 2')
-    signal = fmcw.set_params([15, 18, 22, 24, 27], 40, extract=True)
-    a.plot(signal)   
-    a1.plot(signal)
+    a1.clear(); a2.clear(); a3.clear()
+    a1.set_title('TOF Profile of Antenna 1') 
+    a2.set_title('TOF Profile of Antenna 2')
+    a3.set_title('Localized Coordinates')
+    
+    s1, tof1 = fmcw.set_params([15, 18, 22, 24, 27], 40, extract=True)
+    s2, tof2 = fmcw.set_params([15, 18, 22, 24, 27], 40, extract=True)
+    t1 = np.mean([15, 18, 22, 24, 27])
+    t2 = np.mean([15, 18, 22, 24, 27])
+    c = solve(t1, t2)
+    
+    print c
+
+    # Plots TOFs
+    a1.plot(s1)   
+    a2.plot(s2)
+    # Add reference antennas
+    a3.plot(0, 0, 'xr')
+    a3.plot(1, 0, 'xr')
+    a3.plot(-1, 0, 'xr')
+    # Add localized coordinates
+    a3.plot(c[0], c[1], 'or')
+    a3.set_xlim(-5, 5)
+    a3.set_ylim(-2, 5)
 
 class App(tk.Tk):
 

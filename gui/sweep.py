@@ -47,7 +47,8 @@ class Simulator(object):
         self.vintens = vintens
 
         if extract:
-            return self.extract_movement()
+            self.extract_movement()
+            return self.diffs, self.find_tofs
 
     def _set_static(self):
         """Helper method to generate static signal."""
@@ -70,16 +71,26 @@ class Simulator(object):
     
     def _add_diffs(self):
         """Add diffs of ffts of TOF profiles."""
-        self.ffts = [np.abs(np.fft.rfft(b)) for b in self.basebands]
-        diffs = np.zeros(len(self.ffts[0]))
+        ffts = [np.abs(np.fft.rfft(b)) for b in self.basebands]
+        self.diffs = np.zeros(len(ffts[0]))
 
-        for i in range(0, len(self.ffts) - 1):
-            diffs += np.abs(self.ffts[i+1] - self.ffts[i])
+        for i in range(0, len(ffts) - 1):
+            self.diffs += np.abs(ffts[i+1] - ffts[i])
         
-        return diffs
+        return self.diffs
+
+    def find_tofs(self, threshold):
+        """From fft diffs, find samples that exceed a threshold"""
+        return self.diffs[self.diffs > threshold]
        
     def extract_movement(self):
         """Extract object movement."""
         self.simulate_mixer()
         return self._add_diffs()
+
+    def extract_tofs(self):
+        """Extract tofs."""
+        self.simulate_mixer()
+        self._add_diffs()
+        return self.find_tofs
 
